@@ -23,6 +23,7 @@
   var height = parseInt(args[8], 10);
   var folder = args[9];
   var ssnum = args[10];
+  var zoom = args[11];
   var curnum = 0;
   var errorNum = 0;
   var errorNumMax = 3;
@@ -34,7 +35,17 @@
 
   // Global configurations
 
-  var timeoutTime = 5 * 60 * 1000;
+  var timeoutTime;
+  console.log("Zoom level : " + zoom)
+  if (zoom) {
+    timeoutTime = (21 - parseInt(zoom, 10)) * 60 * 1000;
+    if (timeoutTime <= 0) {
+      timeoutTime = 60 * 1000;
+    }
+  } else {
+    console.log("Zoom is not specified. Timeout is set to 5 min");
+    timeoutTime = 5 * 60 * 1000;
+  }
   var timeout;
   var resourceWaitTime = 5000;
   var timer;
