@@ -12,6 +12,7 @@ WIDTH='900'     #Picture width
 HEIGHT='500'    #Picture height
 FOLDER='./'     #Folder where to save screenshots with \ (or /) in the end. '.' means current folder. 
 NUMBER='0'      #Number of screenshots to take. 0 for infinity.
+CONFIG='./config.json'
 #DO NOT EDIT ANYTHING BELOW THIS LINE
 ARGS="$L $P $AREA $MINLEVEL $MAXLEVEL $V $WIDTH $HEIGHT $FOLDER $NUMBER"
 for arg
@@ -22,4 +23,4 @@ do
     fi
 done
 
-exec ./phantomjs ice.js $ARGS
+exec ./phantomjs --config=${CONFIG} ice.js $ARGS
