@@ -264,7 +264,6 @@
                 document.querySelector("input#smsVerifyPin").click();
               });
             };
-            openMain();
           }, loginTimeout);
         });
       });
@@ -272,6 +271,16 @@
   }
 
   function removeFlagments() {
+    // Check element is exist or not
+    var comm = page.evaluate(function() {
+      return document.querySelector('#comm');
+    });
+    console.log("COMM : " + comm);
+    if (comm == null) {
+      console.log("There is no COMM element");
+      return false;
+    }
+
     page.evaluate(function() {
       document.querySelector('#comm').style.display = 'none';
       document.querySelector('#player_stats').style.display = 'none';
@@ -284,6 +293,11 @@
 
     if ((minlevel > 1) | (maxlevel < 8)) {
       setMinMax(minlevel, maxlevel);
+    } else {
+      console.log('Try to filter :)');
+      page.evaluate(function() {
+        document.querySelector('#filters_container').style.display = 'none'
+      });
     }
 
     // Hide google watermark
@@ -297,15 +311,28 @@
         hide[index].style.display = 'none';
       }
     });
+
+    return true;
   }
 
   function captureService() {
     console.log("*** CaptureService ***");
+    var pageBase = 'https://www.ingress.com/intel';
+    if (page.url.substring(0, pageBase.length) == pageBase && page.url == pageBase) {
+      console.log('It seems to finish authentication. Try to open main logic...');
+      openMain();
+      return;
+    };
     if (page.url != area) {
       console.log("Page is different: " + page.url);
       return;
     }
-    removeFlagments();
+
+    var removed = removeFlagments();
+    if (!removed) {
+      console.log("Flagment is not removed");
+      return;
+    }
     setTimeout(function() {
       console.log("Try to detect clip area");
       var mySelector = "#map_canvas";
