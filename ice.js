@@ -150,29 +150,11 @@
   };
 
   function screenshot() {
-    var loadmessage = page.evaluate(function() {
-      return document.querySelector('#loading_msg');
-    });
     var fragment = page.evaluate(function() {
       return document.querySelector('#filters_container');
     });
 
-    if (loadmessage && fragment) {
-      var visibility1 = loadmessage.style.display;
-      if (visibility1 != "none") {
-
-        var percent_text = page.evaluate(function() {
-          return document.querySelector('#percent_text');
-        });
-        var percent = "?";
-        if (percent_text) {
-          percent = percent_text.innerHTML;
-        }
-        loadingMessageTimer();
-        return;
-      }
-      debug("Message is OK :)");
-
+    if (fragment) {
       page.evaluate(function() {
         document.querySelector('#filters_container').style.display = 'none'
       });
