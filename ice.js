@@ -35,26 +35,52 @@
 
   // Global configurations
 
+  // For page timeout
   var timeoutTime;
   console.log("Zoom level : " + zoom)
   if (zoom) {
-    timeoutTime = (21 - parseInt(zoom, 10)) * 60 * 1000;
+    timeoutTime = (21 - parseInt(zoom, 10)) * 2 * 60 * 1000;
     if (timeoutTime <= 0) {
-      timeoutTime = 60 * 1000;
+      timeoutTime = 2 * 60 * 1000;
     }
   } else {
     console.log("Zoom is not specified. Timeout is set to 5 min");
     timeoutTime = 5 * 60 * 1000;
   }
+
   var timeout;
-  var resourceWaitTime = 5000;
-  var timer;
+  var resourceWaitTime = 30 * 1000;
+  var receiveTimer;
   page.onResourceReceived = function(response) {
-    console.log("Received: " + timer);
-    if (timer) {
-      clearTimeout(timer);
+    console.log("Received : " + receiveTimer);
+    if (receiveTimer) {
+      clearTimeout(receiveTimer);
     }
-    timer = setTimeout(captureService, resourceWaitTime);
+    receiveTimer = setTimeout(loadingMessageTimer, resourceWaitTime);
+  };
+
+  // Loading message detection
+  var loadWaitTime = 30 * 1000;
+  var loadTimer;
+
+  function loadingMessageTimer() {
+    console.log("LoadTimer: " + loadTimer);
+    if (loadTimer) {
+      clearTimeout(loadTimer);
+    }
+    loadTimer = setTimeout(function() {
+      console.log("Timeout fired : " + getDateTime());
+      var loadmessage = page.evaluate(function() {
+        return document.querySelector('#loading_msg');
+      });
+      if (loadmessage && loadmessage.style.display == "none") {
+        console.log("Capture service fired " + getDateTime());
+        captureService();
+      } else {
+        console.log("Capture service not fired :( " + getDateTime());
+        loadingMessageTimer();
+      }
+    }, loadWaitTime);
   };
 
   page.settings.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36";
@@ -139,7 +165,7 @@
         if (percent_text) {
           percent = percent_text.innerHTML;
         }
-        console.log("Loading message found : " + percent);
+        loadingMessageTimer();
         return;
       }
       console.log("Message is OK :)");
@@ -149,6 +175,7 @@
         console.log('Capturing screen from ' + getDateTime() + '...');
         page.render(folder + 'ice-' + getDateTime() + '-no-elem.png');
       }
+      loadingMessageTimer();
       return;
     }
     if (ssnum != 0) {
@@ -334,12 +361,14 @@
     };
     if (page.url != area) {
       console.log("Page is different: " + page.url);
+      loadingMessageTimer();
       return;
     }
 
     var removed = removeFlagments();
     if (!removed) {
       console.log("Flagment is not removed");
+      loadingMessageTimer();
       return;
     }
     setTimeout(function() {
@@ -366,6 +395,7 @@
       page.open(area, function() {
         console.log("Open : " + area);
         console.log('Authenticated successfully, starting screenshotting portals in range between levels ' + minlevel + ' and ' + maxlevel + ' every ' + v / 1000 + 's...');
+        loadingMessageTimer();
       });
     }, 1000);
   }
