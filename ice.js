@@ -11,7 +11,7 @@
   var twostep = 0;
 
   if (!args[10]) {
-    console.log("Please set all variables");
+    debug("Please set all variables");
   }
   var l = args[1];
   var p = args[2];
@@ -28,7 +28,7 @@
   var errorNum = 0;
   var errorNumMax = 3;
   var Version = '2.0.3';
-  var debug = true;
+  var debugMode = true;
   v = 1000 * v;
 
   var val, message, Le;
@@ -37,14 +37,14 @@
 
   // For page timeout
   var timeoutTime;
-  console.log("Zoom level : " + zoom)
+  debug("Zoom level : " + zoom)
   if (zoom) {
     timeoutTime = (21 - parseInt(zoom, 10)) * 2 * 60 * 1000;
     if (timeoutTime <= 0) {
       timeoutTime = 2 * 60 * 1000;
     }
   } else {
-    console.log("Zoom is not specified. Timeout is set to 5 min");
+    debug("Zoom is not specified. Timeout is set to 5 min");
     timeoutTime = 5 * 60 * 1000;
   }
 
@@ -52,7 +52,7 @@
   var resourceWaitTime = 30 * 1000;
   var receiveTimer;
   page.onResourceReceived = function(response) {
-    console.log("Received : " + receiveTimer);
+    debug("Received : " + receiveTimer);
     if (receiveTimer) {
       clearTimeout(receiveTimer);
     }
@@ -64,20 +64,20 @@
   var loadTimer;
 
   function loadingMessageTimer() {
-    console.log("LoadTimer: " + loadTimer);
+    debug("LoadTimer: " + loadTimer);
     if (loadTimer) {
       clearTimeout(loadTimer);
     }
     loadTimer = setTimeout(function() {
-      console.log("Timeout fired : " + getDateTime());
+      debug("Timeout fired");
       var loadmessage = page.evaluate(function() {
         return document.querySelector('#loading_msg');
       });
       if (loadmessage && loadmessage.style.display == "none") {
-        console.log("Capture service fired " + getDateTime());
+        debug("Capture service fired");
         captureService();
       } else {
-        console.log("Capture service not fired :( " + getDateTime());
+        debug("Capture service not fired :(");
         loadingMessageTimer();
       }
     }, loadWaitTime);
@@ -98,8 +98,8 @@
   // Logics
 
   function debug(message) {
-    if (debug) {
-      console.log(message);
+    if (debugMode) {
+      console.log("[" + getDateTime() + "] " + message);
     }
   }
 
@@ -114,10 +114,10 @@
     clearTimeout(timeout);
     errorNum++;
     if (errorNum >= errorNumMax) {
-      console.log("*** Loading error: Error count exceeded :( ***");
+      debug("*** Loading error: Error count exceeded :( ***");
       quit();
     }
-    console.log("*** Loading error: Try to reload " + errorNum + "/" + errorNumMax + " ***");
+    debug("*** Loading error: Try to reload " + errorNum + "/" + errorNumMax + " ***");
     setPageTimeout();
     openMain();
   }
@@ -145,7 +145,7 @@
     if (second.toString().length == 1) {
       var second = '0' + second;
     }
-    var dateTime = year + '-' + month + '-' + day + '--' + hour + '-' + minute + '-' + second;
+    var dateTime = year + '-' + month + '-' + day + '-' + hour + '-' + minute + '-' + second;
     return dateTime;
   };
 
@@ -171,31 +171,31 @@
         loadingMessageTimer();
         return;
       }
-      console.log("Message is OK :)");
+      debug("Message is OK :)");
 
       page.evaluate(function() {
         document.querySelector('#filters_container').style.display = 'none'
       });
-      console.log('Filter fragment :)');
+      debug('Filter fragment :)');
     } else {
-      console.log("Element not found");
-      if (debug) {
-        console.log('Capturing screen from ' + getDateTime() + '...');
+      debug("Element not found");
+      if (debugMode) {
+        debug('Capturing screen from ' + getDateTime() + '...');
         page.render(folder + 'ice-' + getDateTime() + '-no-elem.png');
       }
       loadingMessageTimer();
       return;
     }
     if (ssnum != 0) {
-      console.log('Screen #' + (curnum + 1) + '/' + ssnum + ' captured');
+      debug('Screen #' + (curnum + 1) + '/' + ssnum + ' captured');
       curnum++;
     }
     clearTimeout(timeout);
-    console.log('Capturing screen from ' + getDateTime() + '...');
+    debug('Capturing screen from ' + getDateTime() + '...');
     page.render(folder + 'ice-' + getDateTime() + '.png');
 
     if ((curnum >= ssnum) && (ssnum != 0)) {
-      console.log('Finished sucessfully. Exiting...\nThanks for using ingress-ice!');
+      debug('Finished sucessfully. Exiting...\nThanks for using ingress-ice!');
       quit();
       return;
     } else {
@@ -212,9 +212,9 @@
 
   function quit(err) {
     if (err) {
-      console.log('\nICE crashed. Reason: ' + err + ' :('); //nice XD
+      debug('\nICE crashed. Reason: ' + err + ' :('); //nice XD
     } else {
-      console.log('Quit');
+      debug('Quit');
     };
     phantom.exit();
   };
@@ -232,7 +232,7 @@
     if (!area | area == 0) {
       quit('you forgot to set the location link, didn\'t you?');
     };
-    console.log('     _____ )   ___      _____) \n    (, /  (__/_____)  /        \n      /     /         )__      \n  ___/__   /        /          \n(__ /     (______) (_____)  v' + Version + ' (https://github.com/nibogd/ingress-ice)\n\nIf something doesn\'t work or if you want to submit a feature request, visit https://github.com/nibogd/ingress-ice/issues \nConnecting...');
+    debug('\n     _____ )   ___      _____) \n    (, /  (__/_____)  /        \n      /     /         )__      \n  ___/__   /        /          \n(__ /     (______) (_____)  v' + Version + ' (https://github.com/nibogd/ingress-ice)\n\nIf something doesn\'t work or if you want to submit a feature request, visit https://github.com/nibogd/ingress-ice/issues \nConnecting...');
   }
 
   function checkLogin() {
@@ -250,14 +250,14 @@
 
         var serviceURL = 'https://www.google.com/accounts/ServiceLogin';
         if (inglink.substring(0, serviceURL.length) == serviceURL) {
-          console.log('Login URL is detected : ' + inglink);
+          debug('Login URL is detected : ' + inglink);
         } else {
-          console.log('Already logged in, open main logics : ' + page.url);
+          debug('Already logged in, open main logics : ' + page.url);
           openMain();
           return;
         }
 
-        console.log('Logging in...');
+        debug('Logging in...');
         page.open(inglink, function() {
 
           page.evaluate(function(l) {
@@ -277,7 +277,7 @@
           });
 
           setTimeout(function() {
-            console.log('URI is now ' + page.url.substring(0, 40) + '... .\nVerifying login...');
+            debug('URI is now ' + page.url.substring(0, 40) + '... .\nVerifying login...');
 
             if (page.url.substring(0, serviceURL.length) == serviceURL) {
               quit('login failed: wrong email and/or password')
@@ -285,7 +285,7 @@
 
             var appEngineURL = 'https://appengine.google.com/_ah/loginfo';
             if (page.url.substring(0, appEngineURL.length) == appEngineURL) {
-              console.log('Accepting appEngine request...');
+              debug('Accepting appEngine request...');
               page.evaluate(function() {
                 document.getElementById('persist_checkbox').checked = true;
                 document.getElementsByTagName('form').submit();
@@ -294,9 +294,9 @@
 
             var twoFAURL = 'https://accounts.google.com/SecondFactor';
             if (page.url.substring(0, twoFAURL.length) == twoFAURL) {
-              console.log('Using two-step verification, please enter your code:');
+              debug('Using two-step verification, please enter your code:');
               twostep = system.stdin.readLine();
-              console.log('Sending...')
+              debug('Sending...')
             };
 
             if (twostep) {
@@ -322,10 +322,10 @@
       return document.querySelector('#comm');
     });
     if (comm == null) {
-      console.log("There is no COMM element");
+      debug("There is no COMM element");
       return false;
     } else if (comm.style.display != "none") {
-      console.log("COMM : " + comm);
+      debug("COMM : " + comm);
       page.evaluate(function() {
         document.querySelector('#comm').style.display = 'none';
         document.querySelector('#player_stats').style.display = 'none';
@@ -347,11 +347,11 @@
       return document.querySelector('#filters_container');
     });
     if (fragment == null) {
-      console.log("There is no #filters_container element");
+      debug("There is no #filters_container element");
       return false;
     } else if (fragment.style.display != "none") {
       if ((minlevel > 1) | (maxlevel < 8)) {
-        console.log('Set portal level : ' + minlevel + "/" + maxlevel);
+        debug('Set portal level : ' + minlevel + "/" + maxlevel);
         setMinMax(minlevel, maxlevel);
       }
       return false;
@@ -360,27 +360,27 @@
   }
 
   function captureService() {
-    console.log("*** CaptureService ***");
+    debug("*** CaptureService ***");
     var pageBase = 'https://www.ingress.com/intel';
     if (page.url.substring(0, pageBase.length) == pageBase && page.url == pageBase) {
-      console.log('It seems to finish authentication. Try to open main logic...');
+      debug('It seems to finish authentication. Try to open main logic...');
       openMain();
       return;
     };
     if (page.url != area) {
-      console.log("Page is different: " + page.url);
+      debug("Page is different: " + page.url);
       loadingMessageTimer();
       return;
     }
 
     var removed = removeFragments();
     if (!removed) {
-      console.log("fragment is not removed");
+      debug("fragment is not removed");
       loadingMessageTimer();
       return;
     }
     setTimeout(function() {
-      console.log("Try to detect clip area");
+      debug("Try to detect clip area");
       var mySelector = "#map_canvas";
       var elementBounds = page.evaluate(function(selector) {
         var clipRect = document.querySelector(selector).getBoundingClientRect();
@@ -398,11 +398,11 @@
   }
 
   function openMain() {
-    console.log("Logic : OpenMain");
+    debug("Logic : OpenMain");
     setTimeout(function() {
       page.open(area, function() {
-        console.log("Open : " + area);
-        console.log('Authenticated successfully, starting screenshotting portals in range between levels ' + minlevel + ' and ' + maxlevel + ' every ' + v / 1000 + 's...');
+        debug("Open : " + area);
+        debug('Authenticated successfully, starting screenshotting portals in range between levels ' + minlevel + ' and ' + maxlevel + ' every ' + v / 1000 + 's...');
         loadingMessageTimer();
       });
     }, 1000);
@@ -422,41 +422,41 @@
       var currentMin = parseInt(currentMinStr, 10);
       var currentMax = parseInt(currentMaxStr, 10);
       if (currentMin > min) {
-        console.log('The minimal portal level is too low, using default. Consider setting it higher.');
+        debug('The minimal portal level is too low, using default. Consider setting it higher.');
       } else if (currentMin == min) {
-        console.log('Min specified: ' + currentMin);
+        debug('Min specified: ' + currentMin);
       } else {
         setTimeout(function() {
-          console.log('Change Min value: ' + currentMin + '->' + min);
+          debug('Change Min value: ' + currentMin + '->' + min);
           var rect = page.evaluate(function() {
             return document.querySelectorAll('.level_notch.selected')[0].getBoundingClientRect();
           });
-          console.log("Rect click : " + rect.left + rect.width / 2 + " / " + rect.top + rect.height / 2);
+          debug("Rect click : " + rect.left + rect.width / 2 + " / " + rect.top + rect.height / 2);
           page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
           setTimeout(function() {
             var rect1 = page.evaluate(function(min) {
               return document.querySelector('#level_low' + min).getBoundingClientRect();
             }, min);
-            console.log("Rect1 click : " + rect1.left + rect1.width / 2 + " / " + rect1.top + rect1.height / 2);
+            debug("Rect1 click : " + rect1.left + rect1.width / 2 + " / " + rect1.top + rect1.height / 2);
             page.sendEvent('click', rect1.left + rect1.width / 2, rect1.top + rect1.height / 2);
           }, clickInterval);
         }, clickInterval)
       };
       if (currentMax == max) {
-        console.log('Max specified: ' + currentMax);
+        debug('Max specified: ' + currentMax);
       } else if (max < 8) {
-        console.log('Change Max value: ' + currentMax + '->' + max);
+        debug('Change Max value: ' + currentMax + '->' + max);
         setTimeout(function() {
           var rect2 = page.evaluate(function() {
             return document.querySelectorAll('.level_notch.selected')[1].getBoundingClientRect();
           });
-          console.log("Rect2 click : " + rect2.left + rect2.width / 2 + " / " + rect2.top + rect2.height / 2);
+          debug("Rect2 click : " + rect2.left + rect2.width / 2 + " / " + rect2.top + rect2.height / 2);
           page.sendEvent('click', rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
           setTimeout(function() {
             var rect3 = page.evaluate(function(max) {
               return document.querySelector('#level_high' + max).getBoundingClientRect();
             }, max);
-            console.log("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
+            debug("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
             page.sendEvent('click', rect3.left + rect3.width / 2, rect3.top + rect3.height / 2);
             //
           }, clickInterval)
