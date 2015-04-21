@@ -149,14 +149,17 @@
     return dateTime;
   };
 
-  function s() {
+  function screenshot() {
     var loadmessage = page.evaluate(function() {
       return document.querySelector('#loading_msg');
     });
+    var flagment = page.evaluate(function() {
+      return document.querySelector('#filters_container');
+    });
 
-    if (loadmessage) {
-      var visibility = loadmessage.style.display;
-      if (visibility != "none") {
+    if (loadmessage && flagment) {
+      var visibility1 = loadmessage.style.display;
+      if (visibility1 != "none") {
 
         var percent_text = page.evaluate(function() {
           return document.querySelector('#percent_text');
@@ -169,6 +172,11 @@
         return;
       }
       console.log("Message is OK :)");
+
+      page.evaluate(function() {
+        document.querySelector('#filters_container').style.display = 'none'
+      });
+      console.log('Filter flagment :)');
     } else {
       console.log("Element not found");
       if (debug) {
@@ -385,7 +393,7 @@
       }, mySelector);
       var oldClipRect = page.clipRect;
       page.clipRect = elementBounds;
-      s();
+      screenshot();
     }, 1000);
   }
 
