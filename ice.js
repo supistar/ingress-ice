@@ -153,11 +153,11 @@
     var loadmessage = page.evaluate(function() {
       return document.querySelector('#loading_msg');
     });
-    var flagment = page.evaluate(function() {
+    var fragment = page.evaluate(function() {
       return document.querySelector('#filters_container');
     });
 
-    if (loadmessage && flagment) {
+    if (loadmessage && fragment) {
       var visibility1 = loadmessage.style.display;
       if (visibility1 != "none") {
 
@@ -176,7 +176,7 @@
       page.evaluate(function() {
         document.querySelector('#filters_container').style.display = 'none'
       });
-      console.log('Filter flagment :)');
+      console.log('Filter fragment :)');
     } else {
       console.log("Element not found");
       if (debug) {
@@ -316,7 +316,7 @@
     }, loginTimeout);
   }
 
-  function removeFlagments() {
+  function removeFragments() {
     // Check COMM element is exist or not
     var comm = page.evaluate(function() {
       return document.querySelector('#comm');
@@ -343,7 +343,7 @@
     }
 
     // Check #filters_container element is exist or not
-    var flagment = page.evaluate(function() {
+    var fragment = page.evaluate(function() {
       return document.querySelector('#filters_container');
     });
     if (fragment == null) {
@@ -373,9 +373,9 @@
       return;
     }
 
-    var removed = removeFlagments();
+    var removed = removeFragments();
     if (!removed) {
-      console.log("Flagment is not removed");
+      console.log("fragment is not removed");
       loadingMessageTimer();
       return;
     }
