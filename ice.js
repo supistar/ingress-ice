@@ -29,6 +29,7 @@
   var errorNumMax = 3;
   var Version = '2.0.3';
   var debugMode = true;
+  var prefix = 'capture';
   v = 1000 * v;
 
   var val, message, Le;
@@ -156,7 +157,7 @@
     }
     clearTimeout(timeout);
     debug('Capturing screen from ' + getDateTime() + '...');
-    page.render(folder + 'ice-' + getDateTime() + '.png');
+    page.render(folder + prefix + '-' + getDateTime() + '.png');
 
     if ((curnum >= ssnum) && (ssnum != 0)) {
       debug('Finished sucessfully. Exiting...\nThanks for using ingress-ice!');
