@@ -1,7 +1,7 @@
 /* 
  * Ingress ICE by Nikitakun (https://github.com/nibogd/ingress-ice), distributed under the MIT License
  */
- 
+
 (function() {
 
   // Prepare
@@ -373,61 +373,59 @@
   }
 
   function setMinMax(min, max) {
-    var clickInterval = 2000;
-    var minAvailable = page.evaluate(function() {
-      return document.querySelectorAll('.level_notch.selected')[0];
-    });
-    var maxAvailable = page.evaluate(function() {
-      return document.querySelectorAll('.level_notch.selected')[1];
-    });
-    var currentMinStr = minAvailable.id.replace(/level_(high|low)/g, "");
-    var currentMaxStr = maxAvailable.id.replace(/level_(high|low)/g, "");
-    var currentMin = parseInt(currentMinStr, 10);
-    var currentMax = parseInt(currentMaxStr, 10);
-    if (currentMin > min) {
-      console.log('The minimal portal level is too low, using default. Consider setting it higher.');
-    } else if (currentMin == min) {
-      console.log('Min specified: ' + currentMin);
-    } else {
-      console.log('Change Min value: ' + currentMin + '->' + min);
-      var rect = page.evaluate(function() {
-        return document.querySelectorAll('.level_notch.selected')[0].getBoundingClientRect();
+    var clickInterval = 3000;
+    setTimeout(function() {
+      var minAvailable = page.evaluate(function() {
+        return document.querySelectorAll('.level_notch.selected')[0];
       });
-      console.log("Rect click : " + rect.left + rect.width / 2 + " / " + rect.top + rect.height / 2);
-      page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
-      setTimeout(function() {
-        var rect1 = page.evaluate(function(min) {
-          return document.querySelector('#level_low' + min).getBoundingClientRect();
-        }, min);
-        console.log("Rect1 click : " + rect1.left + rect1.width / 2 + " / " + rect1.top + rect1.height / 2);
-        page.sendEvent('click', rect1.left + rect1.width / 2, rect1.top + rect1.height / 2);
-      }, clickInterval);
-    };
-    if (currentMax == max) {
-      console.log('Max specified: ' + currentMax);
-    } else if (max < 8) {
-      console.log('Change Max value: ' + currentMax + '->' + max);
-      setTimeout(function() {
-        var rect2 = page.evaluate(function() {
-          return document.querySelectorAll('.level_notch.selected')[1].getBoundingClientRect();
-        });
-        console.log("Rect2 click : " + rect2.left + rect2.width / 2 + " / " + rect2.top + rect2.height / 2);
-        page.sendEvent('click', rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
+      var maxAvailable = page.evaluate(function() {
+        return document.querySelectorAll('.level_notch.selected')[1];
+      });
+      var currentMinStr = minAvailable.id.replace(/level_(high|low)/g, "");
+      var currentMaxStr = maxAvailable.id.replace(/level_(high|low)/g, "");
+      var currentMin = parseInt(currentMinStr, 10);
+      var currentMax = parseInt(currentMaxStr, 10);
+      if (currentMin > min) {
+        console.log('The minimal portal level is too low, using default. Consider setting it higher.');
+      } else if (currentMin == min) {
+        console.log('Min specified: ' + currentMin);
+      } else {
         setTimeout(function() {
-          var rect3 = page.evaluate(function(max) {
-            return document.querySelector('#level_high' + max).getBoundingClientRect();
-          }, max);
-          console.log("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
-          page.sendEvent('click', rect3.left + rect3.width / 2, rect3.top + rect3.height / 2);
-          //
+          console.log('Change Min value: ' + currentMin + '->' + min);
+          var rect = page.evaluate(function() {
+            return document.querySelectorAll('.level_notch.selected')[0].getBoundingClientRect();
+          });
+          console.log("Rect click : " + rect.left + rect.width / 2 + " / " + rect.top + rect.height / 2);
+          page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
+          setTimeout(function() {
+            var rect1 = page.evaluate(function(min) {
+              return document.querySelector('#level_low' + min).getBoundingClientRect();
+            }, min);
+            console.log("Rect1 click : " + rect1.left + rect1.width / 2 + " / " + rect1.top + rect1.height / 2);
+            page.sendEvent('click', rect1.left + rect1.width / 2, rect1.top + rect1.height / 2);
+          }, clickInterval);
         }, clickInterval)
-      }, clickInterval)
-    };
-    if (currentMin == min && currentMax == max) {
-      console.log('Filter success :)');
-      page.evaluate(function() {
-        document.querySelector('#filters_container').style.display = 'none'
-      });
-    }
+      };
+      if (currentMax == max) {
+        console.log('Max specified: ' + currentMax);
+      } else if (max < 8) {
+        console.log('Change Max value: ' + currentMax + '->' + max);
+        setTimeout(function() {
+          var rect2 = page.evaluate(function() {
+            return document.querySelectorAll('.level_notch.selected')[1].getBoundingClientRect();
+          });
+          console.log("Rect2 click : " + rect2.left + rect2.width / 2 + " / " + rect2.top + rect2.height / 2);
+          page.sendEvent('click', rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
+          setTimeout(function() {
+            var rect3 = page.evaluate(function(max) {
+              return document.querySelector('#level_high' + max).getBoundingClientRect();
+            }, max);
+            console.log("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
+            page.sendEvent('click', rect3.left + rect3.width / 2, rect3.top + rect3.height / 2);
+            //
+          }, clickInterval)
+        }, clickInterval)
+      };
+    }, clickInterval)
   };
 })();
