@@ -282,47 +282,45 @@
   }
 
   function removeFlagments() {
-    // Check element is exist or not
+    // Check COMM element is exist or not
     var comm = page.evaluate(function() {
       return document.querySelector('#comm');
     });
-    console.log("COMM : " + comm);
     if (comm == null) {
       console.log("There is no COMM element");
       return false;
-    }
-
-    page.evaluate(function() {
-      document.querySelector('#comm').style.display = 'none';
-      document.querySelector('#player_stats').style.display = 'none';
-      document.querySelector('#game_stats').style.display = 'none';
-      document.querySelector('#geotools').style.display = 'none';
-      document.querySelector('#header').style.display = 'none';
-      document.querySelector('#snapcontrol').style.display = 'none';
-      document.querySelectorAll('.img_snap')[0].style.display = 'none';
-    });
-
-    if ((minlevel > 1) | (maxlevel < 8)) {
-      setMinMax(minlevel, maxlevel);
-    } else {
-      console.log('Try to filter :)');
+    } else if (comm.style.display != "none") {
+      console.log("COMM : " + comm);
       page.evaluate(function() {
-        document.querySelector('#filters_container').style.display = 'none'
+        document.querySelector('#comm').style.display = 'none';
+        document.querySelector('#player_stats').style.display = 'none';
+        document.querySelector('#game_stats').style.display = 'none';
+        document.querySelector('#geotools').style.display = 'none';
+        document.querySelector('#header').style.display = 'none';
+        document.querySelector('#snapcontrol').style.display = 'none';
+        document.querySelectorAll('.img_snap')[0].style.display = 'none';
+        document.querySelector('.gm-style > div > a > div > img').style.display = 'none';
+        var hide = document.querySelectorAll('.gmnoprint');
+        for (index = 0; index < hide.length; ++index) {
+          hide[index].style.display = 'none';
+        }
       });
     }
 
-    // Hide google watermark
-    page.evaluate(function() {
-      document.querySelector('.gm-style > div > a > div > img').style.display = 'none';
+    // Check #filters_container element is exist or not
+    var flagment = page.evaluate(function() {
+      return document.querySelector('#filters_container');
     });
-
-    page.evaluate(function() {
-      var hide = document.querySelectorAll('.gmnoprint');
-      for (index = 0; index < hide.length; ++index) {
-        hide[index].style.display = 'none';
+    if (fragment == null) {
+      console.log("There is no #filters_container element");
+      return false;
+    } else if (fragment.style.display != "none") {
+      if ((minlevel > 1) | (maxlevel < 8)) {
+        console.log('Set portal level : ' + minlevel + "/" + maxlevel);
+        setMinMax(minlevel, maxlevel);
       }
-    });
-
+      return false;
+    }
     return true;
   }
 
