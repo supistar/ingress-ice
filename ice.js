@@ -150,24 +150,6 @@
   };
 
   function screenshot() {
-    var fragment = page.evaluate(function() {
-      return document.querySelector('#filters_container');
-    });
-
-    if (fragment) {
-      page.evaluate(function() {
-        document.querySelector('#filters_container').style.display = 'none'
-      });
-      debug('Filter fragment :)');
-    } else {
-      debug("Element not found");
-      if (debugMode) {
-        debug('Capturing screen from ' + getDateTime() + '...');
-        page.render(folder + 'ice-' + getDateTime() + '-no-elem.png');
-      }
-      loadingMessageTimer();
-      return;
-    }
     if (ssnum != 0) {
       debug('Screen #' + (curnum + 1) + '/' + ssnum + ' captured');
       curnum++;
@@ -335,6 +317,10 @@
       if ((minlevel > 1) | (maxlevel < 8)) {
         debug('Set portal level : ' + minlevel + "/" + maxlevel);
         setMinMax(minlevel, maxlevel);
+      } else {
+        page.evaluate(function() {
+          document.querySelector('#filters_container').style.display = 'none'
+        });
       }
       return false;
     }
@@ -440,10 +426,15 @@
             }, max);
             debug("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
             page.sendEvent('click', rect3.left + rect3.width / 2, rect3.top + rect3.height / 2);
-            //
           }, clickInterval)
         }, clickInterval)
       };
+
+      if (currentMin == min && currentMax == max) {
+        page.evaluate(function() {
+          document.querySelector('#filters_container').style.display = 'none'
+        });
+      }
     }, clickInterval)
   };
 })();
