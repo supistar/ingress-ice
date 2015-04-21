@@ -73,7 +73,7 @@
       var loadmessage = page.evaluate(function() {
         return document.querySelector('#loading_msg');
       });
-      if (loadmessage && loadmessage.style.display == "none") {
+      if (loadmessage && loadmessage.style && loadmessage.style.display == "none") {
         debug("Capture service fired");
         captureService();
       } else {
