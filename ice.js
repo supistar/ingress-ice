@@ -5,6 +5,7 @@
 (function() {
 
   // Prepare
+  phantom.injectJs('async/lib/async.js');
   var page = require('webpage').create();
   var system = require('system');
   var args = system.args;
@@ -390,52 +391,69 @@
       var currentMaxStr = maxAvailable.id.replace(/level_(high|low)/g, "");
       var currentMin = parseInt(currentMinStr, 10);
       var currentMax = parseInt(currentMaxStr, 10);
-      if (currentMin > min) {
-        debug('The minimal portal level is too low, using default. Consider setting it higher.');
-      } else if (currentMin == min) {
-        debug('Min specified: ' + currentMin);
-      } else {
-        setTimeout(function() {
-          debug('Change Min value: ' + currentMin + '->' + min);
-          var rect = page.evaluate(function() {
-            return document.querySelectorAll('.level_notch.selected')[0].getBoundingClientRect();
-          });
-          debug("Rect click : " + rect.left + rect.width / 2 + " / " + rect.top + rect.height / 2);
-          page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
-          setTimeout(function() {
-            var rect1 = page.evaluate(function(min) {
-              return document.querySelector('#level_low' + min).getBoundingClientRect();
-            }, min);
-            debug("Rect1 click : " + rect1.left + rect1.width / 2 + " / " + rect1.top + rect1.height / 2);
-            page.sendEvent('click', rect1.left + rect1.width / 2, rect1.top + rect1.height / 2);
-          }, clickInterval);
-        }, clickInterval)
-      };
-      if (currentMax == max) {
-        debug('Max specified: ' + currentMax);
-      } else if (max < 8) {
-        debug('Change Max value: ' + currentMax + '->' + max);
-        setTimeout(function() {
-          var rect2 = page.evaluate(function() {
-            return document.querySelectorAll('.level_notch.selected')[1].getBoundingClientRect();
-          });
-          debug("Rect2 click : " + rect2.left + rect2.width / 2 + " / " + rect2.top + rect2.height / 2);
-          page.sendEvent('click', rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
-          setTimeout(function() {
-            var rect3 = page.evaluate(function(max) {
-              return document.querySelector('#level_high' + max).getBoundingClientRect();
-            }, max);
-            debug("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
-            page.sendEvent('click', rect3.left + rect3.width / 2, rect3.top + rect3.height / 2);
-          }, clickInterval)
-        }, clickInterval)
-      };
 
-      if (currentMin == min && currentMax == max) {
-        page.evaluate(function() {
-          document.querySelector('#filters_container').style.display = 'none'
-        });
-      }
+      async.series({
+        min: function(callback) {
+          if (currentMin > min) {
+            debug('The minimal portal level is too low, using default. Consider setting it higher.');
+            callback(null, false);
+            return;
+          }
+          if (currentMin == min) {
+            debug('Min specified: ' + currentMin);
+            callback(null, true);
+            return;
+          }
+          setTimeout(function() {
+            debug('Change Min value: ' + currentMin + '->' + min);
+            var rect = page.evaluate(function() {
+              return document.querySelectorAll('.level_notch.selected')[0].getBoundingClientRect();
+            });
+            debug("Rect click : " + rect.left + rect.width / 2 + " / " + rect.top + rect.height / 2);
+            page.sendEvent('click', rect.left + rect.width / 2, rect.top + rect.height / 2);
+            setTimeout(function() {
+              var rect1 = page.evaluate(function(min) {
+                return document.querySelector('#level_low' + min).getBoundingClientRect();
+              }, min);
+              debug("Rect1 click : " + rect1.left + rect1.width / 2 + " / " + rect1.top + rect1.height / 2);
+              page.sendEvent('click', rect1.left + rect1.width / 2, rect1.top + rect1.height / 2);
+              callback(null, true);
+            }, clickInterval);
+          }, clickInterval)
+        },
+        max: function(callback) {
+          if (currentMax == max) {
+            debug('Max specified: ' + currentMax);
+            callback(null, true);
+            return;
+          }
+          if (max < 8) {
+            debug('Change Max value: ' + currentMax + '->' + max);
+            setTimeout(function() {
+              var rect2 = page.evaluate(function() {
+                return document.querySelectorAll('.level_notch.selected')[1].getBoundingClientRect();
+              });
+              debug("Rect2 click : " + rect2.left + rect2.width / 2 + " / " + rect2.top + rect2.height / 2);
+              page.sendEvent('click', rect2.left + rect2.width / 2, rect2.top + rect2.height / 2);
+              setTimeout(function() {
+                var rect3 = page.evaluate(function(max) {
+                  return document.querySelector('#level_high' + max).getBoundingClientRect();
+                }, max);
+                debug("Rect3 click : " + rect3.left + rect3.width / 2 + " / " + rect3.top + rect3.height / 2)
+                page.sendEvent('click', rect3.left + rect3.width / 2, rect3.top + rect3.height / 2);
+                callback(null, true);
+              }, clickInterval)
+            }, clickInterval)
+          };
+        }
+      }, function(err, results) {
+        console.log("Results : " + results.max + "/" + results.min);
+        if (results.max && results.min) {
+          page.evaluate(function() {
+            document.querySelector('#filters_container').style.display = 'none'
+          });
+        }
+      })
     }, clickInterval)
   };
 })();
