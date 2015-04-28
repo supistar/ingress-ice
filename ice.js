@@ -271,7 +271,7 @@
       debug("There is no COMM element");
       callback("Error!", false);
       return;
-    } else if (comm.style.display != "none") {
+    } else if (comm.style == null || comm.style.display != "none") {
       debug("COMM element is found");
       page.evaluate(function() {
         document.querySelector('#comm').style.display = 'none';
@@ -297,7 +297,7 @@
       debug("There is no #filters_container element");
       callback("Error!", false);
       return;
-    } else if (fragment.style.display != "none") {
+    } else if (fragment.style == null || fragment.style.display != "none") {
       if ((minlevel > 1) | (maxlevel < 8)) {
         debug('Set portal level : ' + minlevel + "/" + maxlevel);
         setMinMax(minlevel, maxlevel, callback);
