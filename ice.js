@@ -145,7 +145,9 @@
       quit();
       return;
     } else {
-      openMain();
+      setTimeout(function() {
+        page.reload()
+      }, v);
     }
   };
 
