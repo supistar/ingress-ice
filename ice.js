@@ -34,6 +34,7 @@
   v = 1000 * v;
 
   var val, message, Le;
+  var processStart = new Date().getTime();
 
   // Global configurations
 
@@ -58,7 +59,11 @@
     if (receiveTimer) {
       clearTimeout(receiveTimer);
     }
-    receiveTimer = setTimeout(loadingMessageCheckQueue, resourceWaitTime);
+    receiveTimer = setTimeout(function() {
+      if (calcNextDuration() == 0) {
+        loadingMessageCheckQueue();
+      }
+    }, resourceWaitTime);
   };
 
   // Loading message detection
@@ -146,10 +151,19 @@
       return;
     } else {
       setTimeout(function() {
+        processStart = new Date().getTime();
         page.reload()
-      }, v);
+      }, calcNextDuration());
     }
   };
+
+  function calcNextDuration() {
+    var d = v - (new Date().getTime() - processStart);
+    if (d < 0) {
+      return 0;
+    }
+    return v;
+  }
 
   function getRenderedText(html) {
     if (html) {
@@ -317,7 +331,7 @@
 
   function loadingMessageCheckQueue() {
     loadingQueue.push(null, function(err) {
-      if (err == null) {
+      if (calcNextDuration() == 0 && err == null) {
         screenshot();
       }
     });
@@ -391,6 +405,7 @@
     debug("Logic : OpenMain");
     setTimeout(function() {
       page.open(area, function() {
+        processStart = new Date().getTime();
         debug("Open : " + area);
         debug('Authenticated successfully, starting screenshotting portals in range between levels ' + minlevel + ' and ' + maxlevel + ' every ' + v / 1000 + 's...');
       });
