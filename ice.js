@@ -333,13 +333,6 @@
         debug("Error is found");
         return;
       }
-      if (calcNextDuration() < 45 * 1000) {
-        setTimeout(function() {
-          screenshot();
-        }, calcNextDuration());
-      } else {
-        debug("Remaining time is " + calcNextDuration() + " msec. Will wait next load");
-      }
     });
     debug("Loading queue added : " + loadingQueue.length());
   }
@@ -400,6 +393,13 @@
           callback(null, true);
         }, 1000);
         debug("checkClipArea finish");
+      },
+      takeScreenshot: function(callback) {
+        debug("Remaining time is " + calcNextDuration() + "msec.");
+        setTimeout(function() {
+          screenshot();
+          callback(null, true);
+        }, calcNextDuration());
       }
     }, function(err, results) {
       debug("*** Check error : " + err + " ***");
