@@ -60,9 +60,7 @@
       clearTimeout(receiveTimer);
     }
     receiveTimer = setTimeout(function() {
-      if (calcNextDuration() == 0) {
-        loadingMessageCheckQueue();
-      }
+      loadingMessageCheckQueue();
     }, resourceWaitTime);
   };
 
@@ -162,7 +160,7 @@
     if (d < 0) {
       return 0;
     }
-    return v;
+    return d;
   }
 
   function getRenderedText(html) {
@@ -331,8 +329,16 @@
 
   function loadingMessageCheckQueue() {
     loadingQueue.push(null, function(err) {
-      if (calcNextDuration() == 0 && err == null) {
-        screenshot();
+      if (err != null) {
+        debug("Error is found");
+        return;
+      }
+      if (calcNextDuration() < 45 * 1000) {
+        setTimeout(function() {
+          screenshot();
+        }, calcNextDuration());
+      } else {
+        debug("Remaining time is " + calcNextDuration() + " msec. Will wait next load");
       }
     });
     debug("Loading queue added : " + loadingQueue.length());
